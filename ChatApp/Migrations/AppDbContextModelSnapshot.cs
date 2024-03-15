@@ -74,6 +74,50 @@ namespace ChatApp.Migrations
                     b.ToTable("Messages");
                 });
 
+            modelBuilder.Entity("ChatApp.Models.P1LastMessage", b =>
+                {
+                    b.Property<int>("MsgId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MsgId"), 1L, 1);
+
+                    b.Property<int>("ConversationId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Msg")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("MsgId");
+
+                    b.HasIndex("ConversationId");
+
+                    b.ToTable("P1LastMessages");
+                });
+
+            modelBuilder.Entity("ChatApp.Models.P2LastMessage", b =>
+                {
+                    b.Property<int>("MsgId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MsgId"), 1L, 1);
+
+                    b.Property<int>("ConversationId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Msg")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("MsgId");
+
+                    b.HasIndex("ConversationId");
+
+                    b.ToTable("P2LastMessages");
+                });
+
             modelBuilder.Entity("ChatApp.Models.Session", b =>
                 {
                     b.Property<int>("Id")
@@ -117,6 +161,35 @@ namespace ChatApp.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("ChatApp.Models.P1LastMessage", b =>
+                {
+                    b.HasOne("ChatApp.Models.Conversation", "Conversation")
+                        .WithMany("P1LastMessages")
+                        .HasForeignKey("ConversationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Conversation");
+                });
+
+            modelBuilder.Entity("ChatApp.Models.P2LastMessage", b =>
+                {
+                    b.HasOne("ChatApp.Models.Conversation", "Conversation")
+                        .WithMany("P2LastMessages")
+                        .HasForeignKey("ConversationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Conversation");
+                });
+
+            modelBuilder.Entity("ChatApp.Models.Conversation", b =>
+                {
+                    b.Navigation("P1LastMessages");
+
+                    b.Navigation("P2LastMessages");
                 });
 #pragma warning restore 612, 618
         }

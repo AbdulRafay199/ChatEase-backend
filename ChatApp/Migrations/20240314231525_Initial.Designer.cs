@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ChatApp.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240311195402_changedMsgModel")]
-    partial class changedMsgModel
+    [Migration("20240314231525_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -35,9 +35,6 @@ namespace ChatApp.Migrations
                     b.Property<DateTime>("LastActivityTimestamp")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("LastMessageId")
-                        .HasColumnType("int");
-
                     b.Property<int>("P1Id")
                         .HasColumnType("int");
 
@@ -46,9 +43,29 @@ namespace ChatApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("LastMessageId");
-
                     b.ToTable("Conversations");
+                });
+
+            modelBuilder.Entity("ChatApp.Models.LastMessage", b =>
+                {
+                    b.Property<int>("MsgId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MsgId"), 1L, 1);
+
+                    b.Property<int>("ConversationId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Msg")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("MsgId");
+
+                    b.HasIndex("ConversationId");
+
+                    b.ToTable("LastMessages");
                 });
 
             modelBuilder.Entity("ChatApp.Models.Message", b =>
@@ -122,15 +139,20 @@ namespace ChatApp.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("ChatApp.Models.Conversation", b =>
+            modelBuilder.Entity("ChatApp.Models.LastMessage", b =>
                 {
-                    b.HasOne("ChatApp.Models.Message", "LastMessage")
-                        .WithMany()
-                        .HasForeignKey("LastMessageId")
+                    b.HasOne("ChatApp.Models.Conversation", "Conversation")
+                        .WithMany("LastMessages")
+                        .HasForeignKey("ConversationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("LastMessage");
+                    b.Navigation("Conversation");
+                });
+
+            modelBuilder.Entity("ChatApp.Models.Conversation", b =>
+                {
+                    b.Navigation("LastMessages");
                 });
 #pragma warning restore 612, 618
         }
